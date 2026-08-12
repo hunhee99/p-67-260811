@@ -3,7 +3,6 @@ package com.choi.p67260811.domain.post.post.entity;
 
 import com.choi.p67260811.domain.post.comment.entity.PostComment;
 import com.choi.p67260811.global.jpa.entity.BaseEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -50,5 +49,13 @@ public class Post extends BaseEntity {
         postComment.modify(content);
 
         return postComment;
+    }
+
+    public PostComment findCommentById(int id){
+        return comments
+                .stream()
+                .filter(comment -> comment.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
     }
 }
