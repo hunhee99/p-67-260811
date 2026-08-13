@@ -10,10 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -72,24 +69,7 @@ public class PostCommentController {
 
     }
 
-    @GetMapping("/{commentId}/delete")
-    @Transactional
-    public RsData<Void> delete(
-            @PathVariable int postId,
-            @PathVariable int commentId
-    ) {
 
-        Post post = postService.findById(postId).get();
-
-        PostComment postComment = postService.findCommentById(post, commentId);
-
-        postService.deleteComment(post, commentId);
-
-        return new RsData<>(
-                "200-1",
-                "%d번 댓글이 삭제되었습니다.".formatted(commentId)
-        );
-    }
 
     record CommentModifyForm(
             @NotBlank(message = "댓글 내용을 입력해주세요.")
@@ -111,4 +91,22 @@ public class PostCommentController {
         return "%d번 댓글이 수정되었습니다.".formatted(commentId);
     }
 
+    @DeleteMapping("/{commentId}")
+    @Transactional
+    public RsData<Void> delete(
+            @PathVariable int postId,
+            @PathVariable int commentId
+    ) {
+
+        Post post = postService.findById(postId).get();
+
+        PostComment postComment = postService.findCommentById(post, commentId);
+
+        postService.deleteComment(post, commentId);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 댓글이 삭제되었습니다.".formatted(commentId)
+        );
+    }
 }
