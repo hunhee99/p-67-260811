@@ -41,7 +41,7 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public long count() {
+    public Long count() {
         return postRepository.count();
     }
     public void flush() {
@@ -56,4 +56,5 @@ public class PostService {
     public void delete(int id) {
         postRepository.deleteById(id);
     }
+
 }
