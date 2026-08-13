@@ -7,7 +7,6 @@ import com.choi.p67260811.domain.post.post.service.PostService;
 import com.choi.p67260811.global.dto.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,11 +40,11 @@ public class PostController {
     ){}
 
     @PostMapping()
-    public ResponseEntity<RsData<PostWriteResBody>> write(
+    public RsData<PostWriteResBody> write(
             @Valid @RequestBody PostWriteReqBody reqBody
             ){
         Post post = this.postService.write(reqBody.title, reqBody.content);
-        RsData<PostWriteResBody> rsData =  new RsData<>(
+        return  new RsData<>(
                 "201-1",
                 "%d번 글이 성공적으로 등록되었습니다".formatted(post.getId()),
                 new PostWriteResBody(
@@ -53,7 +52,6 @@ public class PostController {
                         postService.count()
                     )
                 );
-        return ResponseEntity.status(rsData.getStatusCode()).body(rsData);
     }
 
 
@@ -65,16 +63,14 @@ public class PostController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RsData<PostDto>> delete(@PathVariable int id) {
+    public RsData<PostDto> delete(@PathVariable int id) {
         Post post = postService.findById(id).get();
         postService.delete(id);
 
-        RsData<PostDto> rsData = new RsData<>(
+        return new RsData<>(
                 "204-1",
                 "게시물이 삭제되었습니다."
         );
-
-        return ResponseEntity.status(rsData.getStatusCode()).body(rsData);
     }
 
 
