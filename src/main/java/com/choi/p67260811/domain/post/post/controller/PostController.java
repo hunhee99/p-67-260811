@@ -48,6 +48,7 @@ public class PostController {
     ){}
 
     @PostMapping()
+    @Transactional
     public RsData<PostWriteResBody> write(
             @Valid @RequestBody PostWriteReqBody reqBody
             ){

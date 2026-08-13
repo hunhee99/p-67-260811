@@ -53,9 +53,9 @@ public class PostCommentController {
 
 
 
-    @GetMapping("/write")
+    @PostMapping("/write")
     @Transactional
-    public String write(
+    public RsData<PostCommentDto> write(
             @PathVariable int postId,
             @Valid CommentWriteForm form
     ) {
@@ -65,7 +65,11 @@ public class PostCommentController {
         // DB 저장
         postService.flush();
 
-        return "%d번 댓글이 성공적으로 등록되었습니다.".formatted(postComment.getId()); // 아직 DB에 저장되지 않은 시점
+        return new RsData<>(
+                "201-1",
+                "%d번 댓글이 성공적으로 등록되었습니다.".formatted(postComment.getId()),
+                new PostCommentDto(postComment)
+        );
 
     }
 
@@ -77,9 +81,9 @@ public class PostCommentController {
             String content
     ){}
 
-    @GetMapping("/{commentId}/modify")
+    @PatchMapping("/{commentId}")
     @Transactional
-    public String modify(
+    public RsData<Void> modify(
             @PathVariable int postId,
             @PathVariable int commentId,
             @Valid CommentModifyForm form
@@ -88,7 +92,10 @@ public class PostCommentController {
         Post post = postService.findById(postId).get();
         postService.modifyComment(post, commentId, form.content);
 
-        return "%d번 댓글이 수정되었습니다.".formatted(commentId);
+        return new RsData<>(
+                "200-1",
+                "%d번 댓글이 수정되었습니다.".formatted(commentId)
+        );
     }
 
     @DeleteMapping("/{commentId}")
