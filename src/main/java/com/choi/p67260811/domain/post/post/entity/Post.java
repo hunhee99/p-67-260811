@@ -58,4 +58,9 @@ public class Post extends BaseEntity {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
     }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

@@ -5,7 +5,10 @@ import com.choi.p67260811.domain.post.post.dto.PostDto;
 import com.choi.p67260811.domain.post.post.entity.Post;
 import com.choi.p67260811.domain.post.post.service.PostService;
 import com.choi.p67260811.global.dto.RsData;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +33,12 @@ public class PostController {
     }
 
     record PostWriteReqBody(
+            @Size(min = 2, max = 10, message = "제목은 2글자 이상 10글자 이하로 작성")
+            @NotBlank(message = "제목을 입력해주세요.")
             String title,
+
+            @Size(min = 2, max = 10, message = "내용은 2글자 이상 10글자 이하로 작성")
+            @NotBlank(message = "내용을 입력해주세요.")
             String content
     ){}
 
@@ -54,6 +62,32 @@ public class PostController {
                 );
     }
 
+    record PostModifyReqBody(
+            @Size(min = 2, max = 10, message = "제목은 2글자 이상 10글자 이하로 작성")
+            @NotBlank(message = "제목을 입력해주세요.")
+            String title,
+
+            @Size(min = 2, max = 10, message = "내용은 2글자 이상 10글자 이하로 작성")
+            @NotBlank(message = "내용을 입력해주세요.")
+            String content
+    ){}
+
+
+    @PatchMapping("/{id}")
+    @Transactional
+    public RsData<Void> modify(
+            @Valid @RequestBody PostModifyReqBody reqBody,
+            @PathVariable int id
+    ) {
+        Post post = postService.findById(id).get();
+        postService.modify(post, reqBody.title, reqBody.content);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 게시물이 수정되었습니다.".formatted(id)
+        );
+    }
+
 
     @GetMapping("/{id}")
     public PostDto detail(@PathVariable int id) {
@@ -68,7 +102,7 @@ public class PostController {
         postService.delete(id);
 
         return new RsData<>(
-                "204-1",
+                "200-1",
                 "게시물이 삭제되었습니다."
         );
     }
