@@ -38,7 +38,7 @@ public class PostService {
     }
 
     public List<Post> findAll() {
-        return postRepository.findAll();
+        return postRepository.findAll().reversed();
     }
 
     public Long count() {
