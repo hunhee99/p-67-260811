@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,8 +45,24 @@ public class ApiV1PostControllerTest {
                 )
                 .andDo(print());
 
+        List<Post> posts = postRepository.findAll();
+
         resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("list"))
                 .andExpect(status().isOk());
+
+        for(int i = 0; i < posts.size(); i++) {
+            Post post = posts.get(i);
+
+            resultActions
+                    .andExpect(jsonPath("$[%d].id".formatted(i)).value(post.getId()))
+                    .andExpect(jsonPath("$[%d].createDate".formatted(i)).exists())
+                    .andExpect(jsonPath("$[%d].modifyDate".formatted(i)).exists())
+                    .andExpect(jsonPath("$[%d].title".formatted(i)).value(post.getTitle()))
+                    .andExpect(jsonPath("$[%d].content".formatted(i)).value(post.getContent()));
+        }
+
     }
 
 
@@ -153,4 +170,5 @@ public class ApiV1PostControllerTest {
 
         assertThat(op.isEmpty());
     }
+
 }
