@@ -84,7 +84,9 @@ public class ApiV1PostController {
 
     @GetMapping("/{id}")
     public PostDto detail(@PathVariable int id) {
+
         Post post = postService.findById(id).get();
+
         return new PostDto(post);
     }
 
@@ -96,7 +98,7 @@ public class ApiV1PostController {
 
         return new RsData<>(
                 "200-1",
-                "게시물이 삭제되었습니다."
+                "%d번 게시물이 삭제되었습니다.".formatted(id)
         );
     }
 
