@@ -13,11 +13,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,6 +32,7 @@ public class ApiV1PostControllerTest {
 
     @Autowired
     private PostRepository postRepository;
+
 
     @Test
     @DisplayName("글 다건 조회")
@@ -69,8 +72,33 @@ public class ApiV1PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 수정")
+    @DisplayName("글 단건 조회")
     void t3() throws Exception {
+
+        int targetId = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/posts/%d".formatted(targetId))
+                )
+                .andDo(print());
+
+        Post post = postRepository.findById(targetId).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("detail"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.createDate").value(matchesPattern(post.getCreateDate().toString().replaceAll("0+$", "") + ".*")))
+                .andExpect(jsonPath("$.modifyDate").value(matchesPattern(post.getModifyDate().toString().replaceAll("0+$", "") + ".*")))
+                .andExpect(jsonPath("$.title").value("제목1"))
+                .andExpect(jsonPath("$.content").value("내용1"));
+    }
+
+    @Test
+    @DisplayName("글 수정")
+    void t4() throws Exception {
         int targetId = 1;
         String title = "제목 수정";
         String content = "내용 수정";
@@ -101,4 +129,28 @@ public class ApiV1PostControllerTest {
         assertThat(post.getContent()).isEqualTo(content);
     }
 
+
+    @Test
+    @DisplayName("글 삭제")
+    void t5() throws Exception {
+        int targetId = 1;
+
+
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/api/v1/posts/%d".formatted(targetId))
+                )
+                .andDo(print());
+
+        // 필수 검증
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isOk());
+
+        // 선택적 검증
+        Optional<Post> op = postRepository.findById(targetId);
+
+        assertThat(op.isEmpty());
+    }
 }
