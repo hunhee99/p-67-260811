@@ -5,6 +5,8 @@ import com.choi.p67260811.domain.post.post.dto.PostDto;
 import com.choi.p67260811.domain.post.post.entity.Post;
 import com.choi.p67260811.domain.post.post.service.PostService;
 import com.choi.p67260811.global.dto.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -17,11 +19,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
+@Tag(name = "ApiV1CommentController", description = "게시물 API")
 public class ApiV1PostController {
 
     private final PostService postService;
 
     @GetMapping()
+    @Operation(summary = "다건 조회")
     public List<PostDto> list() {
         List<Post> postList = postService.findAll();
 
@@ -41,6 +45,7 @@ public class ApiV1PostController {
             @NotBlank(message = "내용을 입력해주세요.")
             String content
     ){}
+
 
     @PostMapping()
     @Transactional
@@ -81,7 +86,7 @@ public class ApiV1PostController {
         );
     }
 
-
+    @Operation(summary = "단건 조회")
     @GetMapping("/{id}")
     public PostDto detail(@PathVariable int id) {
 
@@ -92,6 +97,7 @@ public class ApiV1PostController {
 
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "글 삭제")
     public RsData<PostDto> delete(@PathVariable int id) {
         Post post = postService.findById(id).get();
         postService.delete(id);
